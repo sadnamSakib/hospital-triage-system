@@ -1,26 +1,60 @@
 @import "tailwindcss";
 
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 240, 240, 245;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  font-size: 16px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+/* Make all headings larger */
+h1 {
+  @apply text-4xl font-bold;
+}
+
+h2 {
+  @apply text-3xl font-bold;
+}
+
+h3 {
+  @apply text-2xl font-bold;
+}
+
+/* Increase spacing for better readability */
+p {
+  @apply my-3;
+}
+
+/* Increase default button and input sizes */
+button,
+input,
+select,
+textarea {
+  @apply text-xl;
+}
+
+/* Kiosk-friendly size adjustments */
+@layer components {
+  .kiosk-container {
+    @apply max-w-4xl mx-auto p-6;
+  }
+
+  .kiosk-card {
+    @apply p-6 rounded-xl shadow-xl;
+  }
+
+  .kiosk-button {
+    @apply px-6 py-4 text-xl rounded-xl font-semibold;
+  }
 }
