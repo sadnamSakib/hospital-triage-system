@@ -9,6 +9,7 @@ interface TextInputProps {
   type?: string;
   required?: boolean;
   error?: string;
+  className?: string;
 }
 
 export function TextInput({
@@ -20,9 +21,10 @@ export function TextInput({
   type = "text",
   required = false,
   error,
+  className = "",
 }: TextInputProps) {
   return (
-    <div className="space-y-3">
+    <div className={`space-y-3 ${className}`}>
       <label htmlFor={name} className="block text-xl font-medium text-gray-700">
         {label} {required && <span className="text-red-500">*</span>}
       </label>

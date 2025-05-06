@@ -2,11 +2,12 @@ import React from "react";
 
 interface ButtonProps {
   children: React.ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
   variant?: "primary" | "secondary" | "danger" | "warning";
   fullWidth?: boolean;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
+  className?: string;
 }
 
 export function Button({
@@ -16,6 +17,7 @@ export function Button({
   fullWidth = false,
   disabled = false,
   type = "button",
+  className = "",
 }: ButtonProps) {
   const baseClasses =
     "px-8 py-4 rounded-xl text-xl font-bold transition-colors focus:outline-none focus:ring-4 focus:ring-offset-2 shadow-md";
@@ -39,7 +41,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${baseClasses} ${variantClasses[variant]} ${widthClass} ${disabledClass}`}
+      className={`${baseClasses} ${variantClasses[variant]} ${widthClass} ${disabledClass} ${className}`}
     >
       {children}
     </button>

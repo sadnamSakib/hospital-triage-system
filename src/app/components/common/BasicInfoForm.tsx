@@ -1,30 +1,39 @@
+// components/common/BasicInforForm.tsx
 "use client";
-import React, { useState } from "react";
-import { Card } from "@/app/components/ui/Card";
-import { Button } from "@/app/components/ui/Button";
-import { TextInput } from "@/app/components/ui/TextInput";
-import { RadioGroup } from "@/app/components/ui/RadioGroup";
-import { useTriageContext } from "@/app/context/TriageContext";
-import { UserInfo } from "@/app/types";
 
-export function BasicInfoForm() {
-  const { setUserInfo, setStage } = useTriageContext();
+import React, { useState } from "react";
+import { Card } from "../ui/Card";
+import { Button } from "../ui/Button";
+import { TextInput } from "../ui/TextInput";
+import { RadioGroup } from "../ui/RadioGroup";
+import { useTriageContext } from "../../context/TriageContext";
+import { UserInfo } from "../../types";
+
+export default function BasicInfoForm() {
+  const { setUserInfo, setRoute } = useTriageContext();
+
+  // Form state
   const [formData, setFormData] = useState<UserInfo>({
     name: "",
     dateOfBirth: "",
     sex: "male",
   });
+
+  // Form validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Handle text input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when field is edited
+
+    // Clear error when field is being edited
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
+  // Handle sex selection
   const handleSexChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -32,6 +41,7 @@ export function BasicInfoForm() {
     }));
   };
 
+  // Validate form before submission
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -47,13 +57,19 @@ export function BasicInfoForm() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
       setUserInfo(formData);
-      setStage("initialQuestions");
+      setRoute({ symptom: "none", phase: "initialSymptoms" });
     }
+  };
+
+  // Handle back button
+  const handleBack = () => {
+    setRoute({ symptom: "none", phase: "start" });
   };
 
   return (
@@ -94,7 +110,7 @@ export function BasicInfoForm() {
           />
 
           <div className="flex justify-between pt-4">
-            <Button variant="secondary" onClick={() => setStage("start")}>
+            <Button variant="secondary" onClick={handleBack} type="button">
               Back
             </Button>
             <Button type="submit">Continue</Button>

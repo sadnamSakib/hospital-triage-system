@@ -1,9 +1,0 @@
-export { StartScreen } from "@/app/components/triage/StartScreen";
-export { BasicInfoForm } from "@/app/components/triage/BasicInfoForm";
-export { InitialQuestions } from "@/app/components/triage/InitialQuestions";
-export { TriageRouter } from "@/app/components/triage/TriageRouter";
-export { PainAssessment } from "@/app/components/triage/PainAssessment";
-export { EmergencyScreen } from "@/app/components/triage/EmergencyScreen";
-export { PriorityScreen } from "@/app/components/triage/PriorityScreen";
-export { CompleteScreen } from "@/app/components/triage/CompleteScreen";
-export { FlowChartVisualization } from "@/app/components/triage/FlowChartVisualization";

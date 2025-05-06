@@ -1,11 +1,17 @@
+// components/common/CompleteScreen.tsx
 "use client";
+
 import React from "react";
-import { Card } from "@/app/components/ui/Card";
-import { Button } from "@/app/components/ui/Button";
+import { Card } from "../ui/Card";
+import { Button } from "../ui/Button";
 import { useTriageContext } from "../../context/TriageContext";
 
-export function CompleteScreen() {
+export default function CompleteScreen() {
   const { reset } = useTriageContext();
+
+  const handleRestart = () => {
+    reset();
+  };
 
   return (
     <div className="flex justify-center min-h-screen p-4 bg-gray-100">
@@ -26,7 +32,7 @@ export function CompleteScreen() {
         </div>
 
         <div className="flex justify-center mt-6">
-          <Button onClick={reset}>Start New Assessment</Button>
+          <Button onClick={handleRestart}>Start New Assessment</Button>
         </div>
       </Card>
     </div>

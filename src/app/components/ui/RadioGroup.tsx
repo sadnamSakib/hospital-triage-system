@@ -11,6 +11,7 @@ interface RadioGroupProps {
   value: string;
   onChange: (value: string) => void;
   label?: string;
+  className?: string;
 }
 
 export function RadioGroup({
@@ -19,9 +20,10 @@ export function RadioGroup({
   value,
   onChange,
   label,
+  className = "",
 }: RadioGroupProps) {
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${className}`}>
       {label && (
         <div className="text-xl font-medium text-gray-700 mb-4">{label}</div>
       )}

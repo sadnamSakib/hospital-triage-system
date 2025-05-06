@@ -5,9 +5,16 @@ interface AlertProps {
   message: string;
   title?: string;
   onClose?: () => void;
+  className?: string;
 }
 
-export function Alert({ type, message, title, onClose }: AlertProps) {
+export function Alert({
+  type,
+  message,
+  title,
+  onClose,
+  className = "",
+}: AlertProps) {
   const bgColors = {
     info: "bg-blue-50 border-blue-400 text-blue-700",
     warning: "bg-yellow-50 border-yellow-400 text-yellow-700",
@@ -16,7 +23,7 @@ export function Alert({ type, message, title, onClose }: AlertProps) {
   };
 
   return (
-    <div className={`rounded-xl p-6 border-l-8 ${bgColors[type]}`}>
+    <div className={`rounded-xl p-6 border-l-8 ${bgColors[type]} ${className}`}>
       <div className="flex items-start">
         <div className="flex-shrink-0">
           {type === "info" && (

@@ -1,33 +1,18 @@
 "use client";
-import React, { useEffect } from "react";
-import { Card } from "@/app/components/ui/Card";
-import { Button } from "@/app/components/ui/Button";
-import { Alert } from "@/app/components/ui/Alert";
-import { useTriageContext } from "@/app/context/TriageContext";
 
-export function StartScreen() {
-  const { setStage } = useTriageContext();
+import React from "react";
+import { Card } from "../ui/Card";
+import { Button } from "../ui/Button";
+import { Alert } from "../ui/Alert";
+import { useTriageContext } from "../../context/TriageContext";
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      window.location.reload();
-    }, 120000);
+export default function StartScreen() {
+  const { setRoute } = useTriageContext();
 
-    const resetTimer = () => {
-      clearTimeout(timer);
-    };
-
-    window.addEventListener("click", resetTimer);
-    window.addEventListener("touchstart", resetTimer);
-    window.addEventListener("keypress", resetTimer);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("click", resetTimer);
-      window.removeEventListener("touchstart", resetTimer);
-      window.removeEventListener("keypress", resetTimer);
-    };
-  }, []);
+  // Move to Basic Info screen
+  const handleStart = () => {
+    setRoute({ symptom: "none", phase: "basicInfo" });
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] p-8 bg-gray-100">
@@ -49,7 +34,7 @@ export function StartScreen() {
           </p>
 
           <div className="mt-8">
-            <Button onClick={() => setStage("basicInfo")} fullWidth>
+            <Button onClick={handleStart} fullWidth>
               TAP HERE TO BEGIN
             </Button>
           </div>
