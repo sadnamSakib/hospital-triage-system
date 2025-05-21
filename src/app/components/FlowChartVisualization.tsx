@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useTriageContext } from "../context/TriageContext";
 import { Card } from "./ui/Card";
 import { Button } from "./ui/Button";
@@ -9,13 +9,13 @@ export function FlowChartVisualization() {
   const { state } = useTriageContext();
   const [isVisible, setIsVisible] = useState(false);
 
-  // Toggle chart visibility
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
-  };
+  // Toggle chart visibility with useCallback to prevent recreation on every render
+  const toggleVisibility = useCallback(() => {
+    setIsVisible((prev) => !prev);
+  }, []);
 
-  // Get the current phase description
-  const getPhaseDescription = () => {
+  // Use memoization for expensive computations
+  const phaseDescription = useMemo(() => {
     switch (state.phase) {
       case "start":
         return "Start Screen - Welcome to the triage system";
@@ -24,7 +24,7 @@ export function FlowChartVisualization() {
       case "initialSymptoms":
         return "Phase: Initial Symptom Selection";
       case "phase1":
-        return "Phase 1: Basic Information";
+        return "Phase 1: Pain/Severity Assessment";
       case "phase2":
         return "Phase 2: Question Chain Selection";
       case "phase3":
@@ -44,10 +44,9 @@ export function FlowChartVisualization() {
       default:
         return "Unknown Phase";
     }
-  };
+  }, [state.phase]);
 
-  // Get symptom description
-  const getSymptomDescription = () => {
+  const symptomDescription = useMemo(() => {
     switch (state.symptom) {
       case "headache":
         return "Headache";
@@ -62,10 +61,9 @@ export function FlowChartVisualization() {
       default:
         return "Unknown Symptom";
     }
-  };
+  }, [state.symptom]);
 
-  // Get current priority description
-  const getPriorityDescription = () => {
+  const priorityDescription = useMemo(() => {
     if (!state.currentPriority) return "Not yet determined";
 
     switch (state.currentPriority) {
@@ -82,8 +80,28 @@ export function FlowChartVisualization() {
       default:
         return "Unknown Priority";
     }
-  };
+  }, [state.currentPriority]);
 
+  const priorityColor = useMemo(() => {
+    if (!state.currentPriority) return "bg-blue-50";
+
+    switch (state.currentPriority) {
+      case 1:
+        return "bg-red-100";
+      case 2:
+        return "bg-orange-100";
+      case 3:
+        return "bg-yellow-100";
+      case 4:
+        return "bg-green-100";
+      case 5:
+        return "bg-blue-100";
+      default:
+        return "bg-blue-50";
+    }
+  }, [state.currentPriority]);
+
+  // Early return for hidden state
   if (!isVisible) {
     return (
       <div className="fixed bottom-4 right-4">
@@ -93,6 +111,12 @@ export function FlowChartVisualization() {
       </div>
     );
   }
+
+  // Filter responses just once
+  const filteredResponses = state.responses.filter(response => {
+    return (typeof response.answer === "boolean" && response.answer) ||
+      (typeof response.answer === "string" && response.answer !== "no" && response.answer.length > 0);
+  });
 
   return (
     <div className="fixed bottom-4 right-4 max-w-md w-full">
@@ -107,12 +131,12 @@ export function FlowChartVisualization() {
         <div className="space-y-3">
           <div className="p-2 bg-blue-50 rounded">
             <p className="font-medium">Current Phase:</p>
-            <p>{getPhaseDescription()}</p>
+            <p>{phaseDescription}</p>
           </div>
 
           <div className="p-2 bg-blue-50 rounded">
             <p className="font-medium">Current Symptom:</p>
-            <p>{getSymptomDescription()}</p>
+            <p>{symptomDescription}</p>
           </div>
 
           {state.symptom !== "none" && state.painScore > 0 && (
@@ -122,36 +146,25 @@ export function FlowChartVisualization() {
             </div>
           )}
 
-          <div className="p-2 bg-blue-50 rounded">
+          <div className={`p-2 ${priorityColor} rounded`}>
             <p className="font-medium">Current Priority:</p>
-            <p>{getPriorityDescription()}</p>
+            <p>{priorityDescription}</p>
           </div>
 
-          {state.responses.length > 0 && (
+          {filteredResponses.length > 0 && (
             <div className="p-2 bg-blue-50 rounded">
               <p className="font-medium">Key Responses:</p>
               <ul className="list-disc ml-5 text-sm">
-                {state.responses.map((response, index) => {
-                  // Only show boolean true responses or ones with meaningful values
-                  if (
-                    (typeof response.answer === "boolean" && response.answer) ||
-                    (typeof response.answer === "string" &&
-                      response.answer !== "no" &&
-                      response.answer.length > 0)
-                  ) {
-                    return (
-                      <li key={index}>
-                        {response.id}:{" "}
-                        {typeof response.answer === "boolean"
-                          ? "Yes"
-                          : typeof response.answer === "string"
-                          ? response.answer
-                          : JSON.stringify(response.answer)}
-                      </li>
-                    );
-                  }
-                  return null;
-                })}
+                {filteredResponses.map((response, index) => (
+                  <li key={index}>
+                    {response.id}:{" "}
+                    {typeof response.answer === "boolean"
+                      ? "Yes"
+                      : typeof response.answer === "string"
+                      ? response.answer
+                      : JSON.stringify(response.answer)}
+                  </li>
+                ))}
               </ul>
             </div>
           )}

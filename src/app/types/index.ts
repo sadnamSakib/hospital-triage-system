@@ -43,16 +43,19 @@ export interface QuestionResponse {
 // Priority levels
 export type PriorityLevel = 1 | 2 | 3 | 4 | 5;
 
-// Truth table entry format
-export interface TruthTableKey {
-  symptomKey: string; // Binary representation of symptoms (e.g., "100" for headache only)
-  factorKey: string; // Binary representation of additional factors (e.g., "0001" for constant pain)
-}
-
 // Component route information
 export interface RouteInfo {
   symptom: SymptomType;
   phase: PhaseType;
+}
+
+// Pain scores for each symptom type
+export interface PainScores {
+  headache: number;
+  chest: number;
+  stomach: number;
+  breathing: number;
+  [key: string]: number; // Index signature for dynamic access
 }
 
 // State for the triage context
@@ -62,6 +65,7 @@ export interface TriageState {
   userInfo: UserInfo | null;
   responses: QuestionResponse[];
   painScore: number;
+  painScores: PainScores;
   currentPriority: PriorityLevel | null;
   isPassingOut: boolean;
   historyStack: RouteInfo[];

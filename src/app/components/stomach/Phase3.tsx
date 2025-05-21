@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Alert } from "../ui/Alert";
@@ -8,12 +8,7 @@ import { useTriageContext } from "../../context/TriageContext";
 
 // Stomach Pain Phase 3 - Determine symptom severity
 export default function StomachPhase3() {
-  const { state, calculatePriority, setRoute, goBack } = useTriageContext();
-
-  // Calculate initial priority when component loads
-  useEffect(() => {
-    calculatePriority();
-  }, [calculatePriority]);
+  const { state, setRoute, goBack } = useTriageContext();
 
   // Handle continue
   const handleContinue = () => {
@@ -31,6 +26,9 @@ export default function StomachPhase3() {
     goBack();
   };
 
+  // Get pain score from the correct place
+  const painScore = state.painScores?.stomach || state.painScore;
+
   return (
     <div className="flex justify-center min-h-screen p-4 bg-gray-100">
       <Card className="max-w-lg w-full">
@@ -42,10 +40,10 @@ export default function StomachPhase3() {
           <Alert
             type="info"
             title="Stomach Pain Severity"
-            message={`Your stomach pain severity is ${state.painScores.stomach}/10.`}
+            message={`Your stomach pain severity is ${painScore}/10.`}
           />
 
-          {state.painScores.stomach >= 7 && (
+          {painScore >= 7 && (
             <Alert
               type="warning"
               title="Warning"
@@ -58,7 +56,7 @@ export default function StomachPhase3() {
         <div className="bg-gray-100 p-4 rounded-md mb-6">
           <h3 className="font-medium mb-2">Initial Assessment:</h3>
           <p>
-            <strong>Pain Level:</strong> {state.painScores.stomach}/10
+            <strong>Pain Level:</strong> {painScore}/10
           </p>
           <p>
             <strong>Initial Priority:</strong>{" "}

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { RangeSlider } from "../ui/RangeSlider";
+import { Alert } from "../ui/Alert";
 import { useTriageContext } from "../../context/TriageContext";
 
 // Stomach Pain Phase 1 - Pain Level Assessment
@@ -11,6 +12,12 @@ export default function StomachPhase1() {
   const { setPainScore, setPriority, setRoute, nextPhase, goBack } =
     useTriageContext();
   const [painLevel, setPainLevel] = useState(1);
+  const [showWarning, setShowWarning] = useState(false);
+
+  // Update warning visibility when pain level changes
+  useEffect(() => {
+    setShowWarning(painLevel >= 7);
+  }, [painLevel]);
 
   // Handle continue button
   const handleContinue = () => {
@@ -50,11 +57,24 @@ export default function StomachPhase1() {
             label="On a scale of 1 to 10, how severe is your stomach pain?"
           />
 
+          {showWarning && (
+            <Alert
+              type="warning"
+              title="Severe Pain"
+              message="You've indicated severe pain which may require urgent attention."
+            />
+          )}
+
           <div className="flex justify-between mt-6">
             <Button variant="secondary" onClick={handleBack}>
               Back
             </Button>
-            <Button onClick={handleContinue}>Continue</Button>
+            <Button 
+              onClick={handleContinue}
+              variant={painLevel >= 7 ? "danger" : "primary"}
+            >
+              Continue
+            </Button>
           </div>
         </div>
       </Card>

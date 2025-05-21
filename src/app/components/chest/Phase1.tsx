@@ -1,4 +1,3 @@
-// components/chest/phase1.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -8,15 +7,18 @@ import { RangeSlider } from "../ui/RangeSlider";
 import { Alert } from "../ui/Alert";
 import { useTriageContext } from "../../context/TriageContext";
 
-// Chest Pain Phase 1 - Pain Level Assessment
+// Chest Pain Phase 1 - Pain Level Assessment (immediately routes to emergency)
 export default function ChestPhase1() {
-  const { setPainScore, setRoute, goBack } = useTriageContext();
+  const { setPainScore, setPriority, setRoute, goBack } = useTriageContext();
   const [painLevel, setPainLevel] = useState(1);
 
   // Handle continue button - Chest pain always goes to emergency
   const handleContinue = () => {
     // Save the pain score
     setPainScore("chest", painLevel);
+
+    // Set priority 1 for chest pain
+    setPriority(1);
 
     // All chest pain goes directly to emergency regardless of score
     setRoute({ symptom: "chest", phase: "emergency" });
@@ -35,7 +37,7 @@ export default function ChestPhase1() {
         <Alert
           type="error"
           title="Emergency"
-          message="Chest pain can be a sign of a serious condition. Medical staff will be notified."
+          message="Chest pain requires immediate medical attention. Medical staff will be notified after this step."
         />
 
         <div className="space-y-6 mt-6">
@@ -51,7 +53,9 @@ export default function ChestPhase1() {
             <Button variant="secondary" onClick={handleBack}>
               Back
             </Button>
-            <Button onClick={handleContinue}>Continue</Button>
+            <Button variant="danger" onClick={handleContinue}>
+              Notify Medical Staff
+            </Button>
           </div>
         </div>
       </Card>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Alert } from "../ui/Alert";
@@ -8,12 +8,8 @@ import { useTriageContext } from "../../context/TriageContext";
 
 // Headache Phase 3 - Determine symptom severity
 export default function HeadachePhase3() {
-  const { state, calculatePriority, setRoute, goBack } = useTriageContext();
-
-  // Calculate initial priority when component loads
-  useEffect(() => {
-    calculatePriority();
-  }, [calculatePriority]);
+  const { state, setRoute, goBack } = useTriageContext();
+  const [priorityCalculated, setPriorityCalculated] = useState(false);
 
   // Handle continue
   const handleContinue = () => {

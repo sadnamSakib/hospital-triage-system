@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Alert } from "../ui/Alert";
@@ -8,12 +8,7 @@ import { useTriageContext } from "../../context/TriageContext";
 
 // Stomach Pain Phase 4 - Initial Priority Assignment
 export default function StomachPhase4() {
-  const { state, calculatePriority, nextPhase, goBack } = useTriageContext();
-
-  // Calculate initial priority when component loads
-  useEffect(() => {
-    calculatePriority();
-  }, [calculatePriority]);
+  const { state, nextPhase, goBack } = useTriageContext();
 
   // Handle continue button
   const handleContinue = () => {
@@ -30,6 +25,9 @@ export default function StomachPhase4() {
   const handleBack = () => {
     goBack();
   };
+
+  // Get pain score from the correct place
+  const painScore = state.painScores?.stomach || state.painScore;
 
   // Display appropriate alert based on priority
   const getPriorityAlert = () => {
@@ -82,7 +80,7 @@ export default function StomachPhase4() {
         <div className="bg-gray-100 p-4 rounded-md mt-6 mb-6">
           <h3 className="font-medium mb-2">Initial Assessment:</h3>
           <p>
-            <strong>Pain Level:</strong> {state.painScores.stomach}/10
+            <strong>Pain Level:</strong> {painScore}/10
           </p>
           <p>
             <strong>Initial Priority:</strong>{" "}

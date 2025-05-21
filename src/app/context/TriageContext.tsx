@@ -9,6 +9,7 @@ import {
   PriorityLevel,
   SymptomType,
   RouteInfo,
+  PainScores,
 } from "../types";
 
 // Initial state
@@ -17,143 +18,17 @@ const initialState: TriageState = {
   phase: "start",
   userInfo: null,
   responses: [],
-  painScore: 1,
+  painScore: 0,
+  painScores: {
+    headache: 0,
+    chest: 0,
+    stomach: 0,
+    breathing: 0,
+  },
   currentPriority: null,
   isPassingOut: false,
   historyStack: [{ symptom: "none", phase: "start" }],
   inactive: false,
-};
-
-// Truth table for priority assignment
-// Format: "symptomKey_factorKey" -> priority
-// symptomKey: Binary representation of symptoms (e.g., "100" for headache only)
-// factorKey: Binary representation of additional factors (fever, vomited, rash, constant)
-const truthTable: Record<string, PriorityLevel> = {
-  // Headache (100)
-  "100_0000": 5, // Basic pain
-  "100_0001": 2, // Meningitis
-  "100_0010": 2, // Sepsis
-  "100_0011": 2, // Meningitis
-  "100_0100": 2, // Fetus risk
-  "100_0101": 2, // Fetus risk
-  "100_0110": 2, // Fetus risk
-  "100_0111": 2, // Fetus risk
-  "100_1000": 2, // Sepsis
-  "100_1001": 2, // Meningitis
-  "100_1010": 2, // Sepsis
-  "100_1011": 2, // Sepsis
-  "100_1100": 2, // Fetus risk
-  "100_1101": 2, // Fetus risk
-  "100_1110": 2, // Fetus risk
-  "100_1111": 2, // Fetus risk
-
-  // Stomach (010)
-  "010_0000": 5, // Pain
-  "010_0001": 5, // Pain
-  "010_0010": 5, // Pain
-  "010_0011": 5, // Pain
-  "010_0100": 5, // Pain
-  "010_0101": 5, // Pain
-  "010_0110": 5, // Pain
-  "010_0111": 5, // Pain
-  "010_1000": 5, // Pain
-  "010_1001": 5, // Pain
-  "010_1010": 5, // Pain
-  "010_1011": 5, // Pain
-  "010_1100": 5, // Pain
-  "010_1101": 5, // Pain
-  "010_1110": 5, // Pain
-  "010_1111": 5, // Pain
-
-  // Breathing (001)
-  "001_0000": 2, // Asthma
-  "001_0001": 2, // Fetus risk
-  "001_0010": 2, // Asthma
-  "001_0011": 3, // Cold
-  "001_0100": 2, // Sepsis
-  "001_0101": 2, // Airway risk
-  "001_0110": 2, // Sepsis
-  "001_0111": 3, // Cold
-  "001_1000": 2, // Sepsis
-  "001_1001": 2, // Airway risk
-  "001_1010": 2, // Sepsis
-  "001_1011": 3, // Cold
-  "001_1100": 2, // Sepsis
-  "001_1101": 2, // Sepsis
-  "001_1110": 2, // Airway risk
-  "001_1111": 2, // Sepsis
-
-  // Headache + Stomach (110)
-  "110_0000": 5, // Pain
-  "110_0001": 5, // Pain
-  "110_0010": 5, // Pain
-  "110_0011": 5, // Pain
-  "110_0100": 5, // Pain
-  "110_0101": 5, // Pain
-  "110_0110": 5, // Pain
-  "110_0111": 5, // Pain
-  "110_1000": 5, // Pain
-  "110_1001": 5, // Pain
-  "110_1010": 5, // Pain
-  "110_1011": 5, // Pain
-  "110_1100": 5, // Pain
-  "110_1101": 5, // Pain
-  "110_1110": 5, // Pain
-  "110_1111": 5, // Pain
-
-  // Headache + Breathing (101)
-  "101_0000": 2, // Asthma
-  "101_0001": 2, // Fetus risk
-  "101_0010": 2, // Asthma
-  "101_0011": 2, // Fetus risk
-  "101_0100": 2, // Sepsis
-  "101_0101": 2, // Airway risk
-  "101_0110": 2, // Sepsis
-  "101_0111": 2, // Fetus risk
-  "101_1000": 2, // Sepsis
-  "101_1001": 2, // Airway risk
-  "101_1010": 2, // Sepsis
-  "101_1011": 2, // Sepsis
-  "101_1100": 3, // Cold
-  "101_1101": 2, // Sepsis
-  "101_1110": 2, // Airway risk
-  "101_1111": 2, // Sepsis
-
-  // Stomach + Breathing (011)
-  "011_0000": 5, // Pain
-  "011_0001": 5, // Pain
-  "011_0010": 5, // Pain
-  "011_0011": 5, // Pain
-  "011_0100": 5, // Pain
-  "011_0101": 5, // Pain
-  "011_0110": 5, // Pain
-  "011_0111": 5, // Pain
-  "011_1000": 5, // Pain
-  "011_1001": 5, // Pain
-  "011_1010": 5, // Pain
-  "011_1011": 5, // Pain
-  "011_1100": 5, // Pain
-  "011_1101": 5, // Pain
-  "011_1110": 5, // Pain
-  "011_1111": 5, // Pain
-
-  // All symptoms (111)
-  "111_0000": 2, // Fetus risk
-  "111_0001": 2, // Fetus risk
-  "111_0010": 2, // Fetus risk
-  "111_0011": 2, // Fetus risk
-  "111_0100": 2, // Fetus risk
-  "111_0101": 2, // Fetus risk
-  "111_0110": 2, // Fetus risk
-  "111_0111": 2, // Fetus risk
-  "111_1000": 2, // Fetus risk
-  "111_1001": 2, // Fetus risk
-  "111_1010": 2, // Fetus risk
-  "111_1011": 2, // Fetus risk
-  "111_1100": 2, // Fetus risk
-  "111_1101": 2, // Fetus risk
-  "111_1110": 2, // Fetus risk
-  "111_1111": 2, // Fetus risk
 };
 
 // Action types
@@ -161,7 +36,7 @@ type ActionType =
   | { type: "SET_ROUTE"; payload: RouteInfo }
   | { type: "SET_USER_INFO"; payload: UserInfo }
   | { type: "ADD_RESPONSE"; payload: QuestionResponse }
-  | { type: "SET_PAIN_SCORE"; payload: number }
+  | { type: "SET_PAIN_SCORE"; payload: { symptom?: string; score: number } }
   | { type: "SET_PRIORITY"; payload: PriorityLevel }
   | { type: "SET_PASSING_OUT"; payload: boolean }
   | { type: "SET_INACTIVE"; payload: boolean }
@@ -202,10 +77,32 @@ function triageReducer(state: TriageState, action: ActionType): TriageState {
         responses: newResponses,
       };
     case "SET_PAIN_SCORE":
-      return {
-        ...state,
-        painScore: action.payload,
-      };
+      if (action.payload.symptom) {
+        // Update specific symptom pain score
+        return {
+          ...state,
+          painScores: {
+            ...state.painScores,
+            [action.payload.symptom]: action.payload.score,
+          },
+          // Also update general pain score if it's the current symptom
+          painScore:
+            state.symptom === action.payload.symptom
+              ? action.payload.score
+              : state.painScore,
+        };
+      } else {
+        // Update general pain score
+        return {
+          ...state,
+          painScore: action.payload.score,
+          // Also update specific symptom pain score if applicable
+          painScores: {
+            ...state.painScores,
+            [state.symptom]: action.payload.score,
+          },
+        };
+      }
     case "SET_PRIORITY":
       return {
         ...state,
@@ -251,13 +148,13 @@ interface TriageContextType {
   setRoute: (route: RouteInfo) => void;
   setUserInfo: (info: UserInfo) => void;
   addResponse: (response: QuestionResponse) => void;
-  setPainScore: (score: number) => void;
+  setPainScore: (symptomOrScore: string | number, score?: number) => void;
   setPriority: (level: PriorityLevel) => void;
   setPassingOut: (isPassingOut: boolean) => void;
   setInactive: (isInactive: boolean) => void;
   goBack: () => void;
   reset: () => void;
-  calculatePriority: () => PriorityLevel;
+  calculatePriority: (updateState?: boolean) => PriorityLevel;
   nextPhase: () => void;
 }
 
@@ -285,8 +182,21 @@ export function TriageProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "ADD_RESPONSE", payload: response });
   };
 
-  const setPainScore = (score: number) => {
-    dispatch({ type: "SET_PAIN_SCORE", payload: score });
+  // Updated to handle both individual symptom scores and general score
+  const setPainScore = (symptomOrScore: string | number, score?: number) => {
+    if (typeof symptomOrScore === "string" && typeof score === "number") {
+      // Setting score for a specific symptom
+      dispatch({
+        type: "SET_PAIN_SCORE",
+        payload: { symptom: symptomOrScore, score },
+      });
+    } else if (typeof symptomOrScore === "number") {
+      // Setting general score
+      dispatch({
+        type: "SET_PAIN_SCORE",
+        payload: { score: symptomOrScore },
+      });
+    }
   };
 
   const setPriority = (level: PriorityLevel) => {
@@ -309,61 +219,87 @@ export function TriageProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "RESET" });
   };
 
-  // Create a key for the truth table lookup
-  const createTruthTableKey = (): string => {
-    // Create symptom key (3 bits: headache, stomach, breathing)
-    const hasHeadache = state.symptom === "headache" ? "1" : "0";
-    const hasStomach = state.symptom === "stomach" ? "1" : "0";
-    const hasBreathing = state.symptom === "breathing" ? "1" : "0";
-    const symptomKey = `${hasHeadache}${hasStomach}${hasBreathing}`;
-
-    // Create factor key (4 bits based on responses)
-    const hasFever = state.responses.some(
-      (r) => r.id === "hasFever" && r.answer === true
-    )
-      ? "1"
-      : "0";
-    const hasVomited = state.responses.some(
-      (r) => r.id === "hasVomited" && r.answer === true
-    )
-      ? "1"
-      : "0";
-    const hasRash = state.responses.some(
-      (r) => r.id === "hasRash" && r.answer === true
-    )
-      ? "1"
-      : "0";
-    const isPainConstant = state.responses.some(
-      (r) => r.id === "painConstant" && r.answer === true
-    )
-      ? "1"
-      : "0";
-
-    const factorKey = `${hasFever}${hasVomited}${hasRash}${isPainConstant}`;
-
-    return `${symptomKey}_${factorKey}`;
-  };
-
-  // Calculate priority based on symptoms and responses
-  const calculatePriority = (): PriorityLevel => {
-    // Check for chest pain - always Priority 1
+  // Calculate priority based on symptoms, pain level, and responses
+  // Updated to not automatically set state by default
+  const calculatePriority = (updateState = false): PriorityLevel => {
+    // Check for immediate emergency conditions
+    
+    // 1. Chest pain - always Priority 1 (Emergency)
     if (state.symptom === "chest") {
-      setPriority(1);
+      if (updateState) setPriority(1);
       return 1;
     }
 
-    // Check for breathing difficulty with passing out - Priority 1
+    // 2. Breathing difficulty with passing out - Priority 1 (Emergency)
     if (state.symptom === "breathing" && state.isPassingOut) {
-      setPriority(1);
+      if (updateState) setPriority(1);
       return 1;
     }
 
-    const painScore = state.painScore;
+    // 3. Severe pain (≥7) - Priority 2 (Very Urgent)
+    const painScore = state.symptom === "headache" || state.symptom === "stomach" ? 
+                      state.painScore : 
+                      state.painScores[state.symptom] || 0;
+                      
+    if (painScore >= 7) {
+      if (updateState) setPriority(2);
+      return 2;
+    }
 
+    // Check for specific condition combinations based on responses
+    
+    // Breathing difficulty with special conditions
+    if (state.symptom === "breathing") {
+      const hasAsthma = state.responses.some(r => r.id === "hasAsthma" && r.answer === true);
+      const hasFever = state.responses.some(r => r.id === "hasFever" && r.answer === true);
+      
+      if (hasAsthma) {
+        if (updateState) setPriority(2); // Asthma with breathing difficulty = Priority 2
+        return 2;
+      }
+      
+      if (hasFever) {
+        if (updateState) setPriority(3); // Cold/fever with breathing difficulty = Priority 3
+        return 3;
+      }
+      
+      // Default for breathing difficulties
+      if (updateState) setPriority(3);
+      return 3;
+    }
+    
+    // Headache with special conditions
+    if (state.symptom === "headache") {
+      const hasVomited = state.responses.some(r => r.id === "hasVomited" && r.answer === true);
+      const hasFever = state.responses.some(r => r.id === "hasFever" && r.answer === true);
+      const hasRash = state.responses.some(r => r.id === "hasRash" && r.answer === true);
+      
+      if (hasVomited && hasRash) {
+        if (updateState) setPriority(2); // Potential meningitis = Priority 2
+        return 2;
+      }
+      
+      if (hasFever) {
+        if (updateState) setPriority(3); // Fever with headache = Priority 3
+        return 3;
+      }
+    }
+    
+    // Stomach pain with special conditions
+    if (state.symptom === "stomach") {
+      const hasVomited = state.responses.some(r => r.id === "hasVomited" && r.answer === true);
+      const isPainConstant = state.responses.some(r => r.id === "painConstant" && r.answer === true);
+      
+      if (hasVomited && isPainConstant) {
+        if (updateState) setPriority(3); // Constant pain with vomiting = Priority 3
+        return 3;
+      }
+    }
+
+    // Use pain score for default priority calculation
     let calculatedPriority: PriorityLevel;
-    if (painScore > 7) {
-      calculatedPriority = 2;
-    } else if (painScore >= 5 && painScore <= 7) {
+    
+    if (painScore >= 5 && painScore < 7) {
       calculatedPriority = 3;
     } else if (painScore >= 3 && painScore < 5) {
       calculatedPriority = 4;
@@ -371,29 +307,18 @@ export function TriageProvider({ children }: { children: ReactNode }) {
       calculatedPriority = 5;
     }
 
-    // For breathing difficulty without passing out - use Priority 3
-    if (state.symptom === "breathing" && !state.isPassingOut) {
-      calculatedPriority = 3;
-    }
-    // Look up in truth table
-    // const key = createTruthTableKey();
-    // if (truthTable[key]) {
-    //   const tablePriority = truthTable[key];
-    //   setPriority(tablePriority);
-    //   return tablePriority;
-    // }
-
-    // If not in truth table, use pain score logic
-
-    setPriority(calculatedPriority);
+    if (updateState) setPriority(calculatedPriority);
     return calculatedPriority;
   };
 
-  // Determine the next phase based on current phase
+  // Determine the next phase based on current phase and symptom
+  // Updated to match flowchart progression
   const nextPhase = () => {
     let nextPhase: PhaseType;
     const currentPhase = state.phase;
+    const currentSymptom = state.symptom;
 
+    // Common phase progression
     switch (currentPhase) {
       case "start":
         nextPhase = "basicInfo";
@@ -402,10 +327,23 @@ export function TriageProvider({ children }: { children: ReactNode }) {
         nextPhase = "initialSymptoms";
         break;
       case "initialSymptoms":
-        nextPhase = "phase1";
+        // Special case for chest pain - go directly to emergency
+        if (currentSymptom === "chest") {
+          nextPhase = "emergency";
+        } else {
+          nextPhase = "phase1";
+        }
         break;
       case "phase1":
-        nextPhase = "phase2";
+        // Handle high pain scores that go directly to emergency
+        if ((currentSymptom === "headache" || currentSymptom === "stomach") && 
+            state.painScore >= 7) {
+          nextPhase = "emergency";
+        } else if (currentSymptom === "breathing" && state.isPassingOut) {
+          nextPhase = "emergency";
+        } else {
+          nextPhase = "phase2";
+        }
         break;
       case "phase2":
         nextPhase = "phase3";
@@ -414,31 +352,23 @@ export function TriageProvider({ children }: { children: ReactNode }) {
         nextPhase = "phase4";
         break;
       case "phase4":
-        // If chest pain or breathing with passing out, go to emergency
-        if (
-          state.symptom === "chest" ||
-          (state.symptom === "breathing" && state.isPassingOut)
-        ) {
+        // Check priority before proceeding - emergency for priority 1
+        if (state.currentPriority === 1) {
           nextPhase = "emergency";
         } else {
           nextPhase = "phase5";
         }
         break;
       case "phase5":
-        // For stomach pain, check priority before going to phase 6
-        if (state.symptom === "stomach") {
-          const priority = calculatePriority();
-          if (priority < 2) {
-            nextPhase = "phase6";
-          } else {
-            nextPhase = "priority";
-          }
-        } else {
-          nextPhase = "phase6";
-        }
+        nextPhase = "phase6";
         break;
       case "phase6":
+        // After phase6, go to priority screen to show final triage result
         nextPhase = "priority";
+        break;
+      case "emergency":
+      case "priority":
+        nextPhase = "complete";
         break;
       default:
         nextPhase = "complete";

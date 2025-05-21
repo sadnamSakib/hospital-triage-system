@@ -1,24 +1,19 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Alert } from "../ui/Alert";
 import { useTriageContext } from "../../context/TriageContext";
 
 export default function EmergencyScreen() {
-  const { state, reset, setPriority } = useTriageContext();
-
-  // Set priority to 1 (Emergency) when this screen loads
-  useEffect(() => {
-    setPriority(1);
-  }, []);
+  const { state, reset } = useTriageContext();
 
   // Get appropriate emergency message based on the symptom
   const getEmergencyMessage = () => {
     switch (state.symptom) {
       case "chest":
-        return "You've reported chest pain, which could be a sign of a serious condition requiring immediate medical attention.";
+        return "You've reported chest pain, which requires immediate medical attention.";
       case "breathing":
         return state.isPassingOut
           ? "You've reported severe breathing difficulty with risk of passing out, which requires immediate medical attention."
@@ -51,7 +46,8 @@ export default function EmergencyScreen() {
         />
 
         <div className="mt-6">
-          <p className="font-medium text-xl">Priority Level: 1 (Highest)</p>
+          <p className="font-medium text-xl">Priority Level: {state.currentPriority || 1} (Highest)</p>
+          
           {state.userInfo && (
             <div className="mt-4 bg-gray-100 p-4 rounded-md">
               <p>
@@ -74,10 +70,39 @@ export default function EmergencyScreen() {
               {state.symptom === "stomach" && "Stomach Pain"}
               {state.symptom === "breathing" && "Breathing Difficulty"}
 
-              {state.symptom !== "none" &&
-                state.painScore > 0 &&
+              {state.symptom !== "none" && state.painScore > 0 &&
                 ` (Severity: ${state.painScore}/10)`}
             </p>
+            
+            {/* Display key responses */}
+            {state.responses.length > 0 && (
+              <div className="mt-2">
+                <p className="font-medium">Key Information:</p>
+                <ul className="list-disc ml-5">
+                  {state.responses.map((response, index) => {
+                    // Only show boolean true responses or ones with meaningful values
+                    if (
+                      (typeof response.answer === "boolean" && response.answer) ||
+                      (typeof response.answer === "string" &&
+                        response.answer !== "no" &&
+                        response.answer.length > 0)
+                    ) {
+                      return (
+                        <li key={index}>
+                          {response.id}:{" "}
+                          {typeof response.answer === "boolean"
+                            ? "Yes"
+                            : typeof response.answer === "string"
+                            ? response.answer
+                            : JSON.stringify(response.answer)}
+                        </li>
+                      );
+                    }
+                    return null;
+                  })}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
 

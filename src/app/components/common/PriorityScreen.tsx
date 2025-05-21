@@ -7,14 +7,7 @@ import { Alert } from "../ui/Alert";
 import { useTriageContext } from "../../context/TriageContext";
 
 export default function PriorityScreen() {
-  const { state, reset, calculatePriority } = useTriageContext();
-
-  // Ensure priority is calculated when this screen loads
-  useEffect(() => {
-    if (!state.currentPriority) {
-      calculatePriority();
-    }
-  }, []);
+  const { state, reset } = useTriageContext();
 
   const getPriorityText = () => {
     switch (state.currentPriority) {
@@ -35,6 +28,8 @@ export default function PriorityScreen() {
 
   const getAlertType = () => {
     switch (state.currentPriority) {
+      case 1:
+        return "error";
       case 2:
         return "warning";
       case 3:
@@ -59,7 +54,7 @@ export default function PriorityScreen() {
 
         <Alert
           type={getAlertType()}
-          title={`Priority Level: ${state.currentPriority}`}
+          title={`Priority Level: ${state.currentPriority || 'Not determined'}`}
           message={getPriorityText()}
         />
 
@@ -77,34 +72,40 @@ export default function PriorityScreen() {
               {state.symptom === "stomach" && "Stomach Pain"}
               {state.symptom === "breathing" && "Breathing Difficulty"}
 
-              {state.symptom !== "none" &&
-                state.painScore > 0 &&
+              {state.symptom !== "none" && state.painScore > 0 &&
                 ` (Severity: ${state.painScore}/10)`}
             </p>
 
             {/* Display relevant responses */}
             <div className="mt-2">
-              {state.responses.map((response, index) => {
-                // Only display selected "true" responses or ones with meaningful values
-                if (
-                  (typeof response.answer === "boolean" && response.answer) ||
-                  (typeof response.answer === "string" &&
-                    response.answer !== "no" &&
-                    response.answer.length > 0)
-                ) {
-                  return (
-                    <p key={index}>
-                      <strong>{response.id}:</strong>{" "}
-                      {typeof response.answer === "boolean"
-                        ? "Yes"
-                        : typeof response.answer === "string"
-                        ? response.answer
-                        : JSON.stringify(response.answer)}
-                    </p>
-                  );
-                }
-                return null;
-              })}
+              {state.responses.length > 0 && (
+                <>
+                  <p className="font-medium">Key Information:</p>
+                  <ul className="list-disc ml-5">
+                    {state.responses.map((response, index) => {
+                      // Only display selected "true" responses or ones with meaningful values
+                      if (
+                        (typeof response.answer === "boolean" && response.answer) ||
+                        (typeof response.answer === "string" &&
+                          response.answer !== "no" &&
+                          response.answer.length > 0)
+                      ) {
+                        return (
+                          <li key={index}>
+                            <strong>{response.id}:</strong>{" "}
+                            {typeof response.answer === "boolean"
+                              ? "Yes"
+                              : typeof response.answer === "string"
+                              ? response.answer
+                              : JSON.stringify(response.answer)}
+                          </li>
+                        );
+                      }
+                      return null;
+                    })}
+                  </ul>
+                </>
+              )}
             </div>
           </div>
 

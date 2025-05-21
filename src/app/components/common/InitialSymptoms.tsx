@@ -1,4 +1,3 @@
-// components/common/InitialSymptoms.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -9,7 +8,7 @@ import { useTriageContext } from "../../context/TriageContext";
 import { SymptomType } from "../../types";
 
 export default function InitialSymptoms() {
-  const { setRoute } = useTriageContext();
+  const { setRoute, setPriority } = useTriageContext();
   const [selectedSymptom, setSelectedSymptom] = useState<SymptomType>("none");
 
   // Array of available symptoms
@@ -29,12 +28,13 @@ export default function InitialSymptoms() {
   // Handle continue button
   const handleContinue = () => {
     if (selectedSymptom === "none") {
-      alert("Please select a symptom or choose 'No symptoms'");
+      alert("Please select a symptom");
       return;
     }
 
-    // Special case for chest pain - immediate emergency
+    // Special case for chest pain - immediate emergency with priority 1
     if (selectedSymptom === "chest") {
+      setPriority(1); // Set priority 1 (Emergency)
       setRoute({ symptom: selectedSymptom, phase: "emergency" });
       return;
     }
@@ -76,11 +76,25 @@ export default function InitialSymptoms() {
           </select>
         </div>
 
+        {selectedSymptom === "chest" && (
+          <Alert
+            type="error"
+            title="Emergency Symptom"
+            message="Chest pain requires immediate medical attention."
+            className="mt-4"
+          />
+        )}
+
         <div className="flex justify-between mt-10">
           <Button variant="secondary" onClick={handleBack}>
             Back
           </Button>
-          <Button onClick={handleContinue}>Continue</Button>
+          <Button 
+            onClick={handleContinue}
+            variant={selectedSymptom === "chest" ? "danger" : "primary"}
+          >
+            Continue
+          </Button>
         </div>
       </Card>
     </div>

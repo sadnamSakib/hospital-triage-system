@@ -9,7 +9,7 @@ import { useTriageContext } from "../../context/TriageContext";
 
 // Breathing Difficulty Phase 1 - Initial Assessment
 export default function BreathingPhase1() {
-  const { setPriority, setPassingOut, setRoute, nextPhase, goBack } =
+  const { addResponse, setPriority, setPassingOut, setRoute, nextPhase, goBack } =
     useTriageContext();
   const [isPassingOut, setIsPassingOut] = useState("no");
 
@@ -18,6 +18,7 @@ export default function BreathingPhase1() {
     // Save the passing out response
     const feelingPassingOut = isPassingOut === "yes";
     setPassingOut(feelingPassingOut);
+    addResponse({ id: "isPassingOut", answer: feelingPassingOut });
 
     if (feelingPassingOut) {
       // If patient feels like they might pass out, set priority 1 and go to emergency
@@ -64,7 +65,12 @@ export default function BreathingPhase1() {
             <Button variant="secondary" onClick={handleBack}>
               Back
             </Button>
-            <Button onClick={handleContinue}>Continue</Button>
+            <Button 
+              onClick={handleContinue}
+              variant={isPassingOut === "yes" ? "danger" : "primary"}
+            >
+              Continue
+            </Button>
           </div>
         </div>
       </Card>
