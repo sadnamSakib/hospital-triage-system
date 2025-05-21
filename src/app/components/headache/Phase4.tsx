@@ -13,7 +13,7 @@ export default function HeadachePhase4() {
   // Calculate initial priority when component loads
   useEffect(() => {
     calculatePriority();
-  }, [calculatePriority]);
+  }, []);
 
   // Handle continue button
   const handleContinue = () => {
@@ -74,7 +74,7 @@ export default function HeadachePhase4() {
         <div className="bg-gray-100 p-4 rounded-md mt-6 mb-6">
           <h3 className="font-medium mb-2">Initial Assessment:</h3>
           <p>
-            <strong>Pain Level:</strong> {state.painScores.headache}/10
+            <strong>Pain Level:</strong> {state.painScore}/10
           </p>
           <p>
             <strong>Initial Priority:</strong>{" "}

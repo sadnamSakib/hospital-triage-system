@@ -115,10 +115,10 @@ export function FlowChartVisualization() {
             <p>{getSymptomDescription()}</p>
           </div>
 
-          {state.symptom !== "none" && state.painScores[state.symptom] > 0 && (
+          {state.symptom !== "none" && state.painScore > 0 && (
             <div className="p-2 bg-blue-50 rounded">
               <p className="font-medium">Pain/Severity Level:</p>
-              <p>{state.painScores[state.symptom]}/10</p>
+              <p>{state.painScore}/10</p>
             </div>
           )}
 

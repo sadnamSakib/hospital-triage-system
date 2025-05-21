@@ -17,13 +17,7 @@ const initialState: TriageState = {
   phase: "start",
   userInfo: null,
   responses: [],
-  painScores: {
-    headache: 0,
-    chest: 0,
-    stomach: 0,
-    breathing: 0,
-    none: 0,
-  },
+  painScore: 1,
   currentPriority: null,
   isPassingOut: false,
   historyStack: [{ symptom: "none", phase: "start" }],
@@ -167,7 +161,7 @@ type ActionType =
   | { type: "SET_ROUTE"; payload: RouteInfo }
   | { type: "SET_USER_INFO"; payload: UserInfo }
   | { type: "ADD_RESPONSE"; payload: QuestionResponse }
-  | { type: "SET_PAIN_SCORE"; payload: { symptom: SymptomType; score: number } }
+  | { type: "SET_PAIN_SCORE"; payload: number }
   | { type: "SET_PRIORITY"; payload: PriorityLevel }
   | { type: "SET_PASSING_OUT"; payload: boolean }
   | { type: "SET_INACTIVE"; payload: boolean }
@@ -210,10 +204,7 @@ function triageReducer(state: TriageState, action: ActionType): TriageState {
     case "SET_PAIN_SCORE":
       return {
         ...state,
-        painScores: {
-          ...state.painScores,
-          [action.payload.symptom]: action.payload.score,
-        },
+        painScore: action.payload,
       };
     case "SET_PRIORITY":
       return {
@@ -260,7 +251,7 @@ interface TriageContextType {
   setRoute: (route: RouteInfo) => void;
   setUserInfo: (info: UserInfo) => void;
   addResponse: (response: QuestionResponse) => void;
-  setPainScore: (symptom: SymptomType, score: number) => void;
+  setPainScore: (score: number) => void;
   setPriority: (level: PriorityLevel) => void;
   setPassingOut: (isPassingOut: boolean) => void;
   setInactive: (isInactive: boolean) => void;
@@ -294,8 +285,8 @@ export function TriageProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "ADD_RESPONSE", payload: response });
   };
 
-  const setPainScore = (symptom: SymptomType, score: number) => {
-    dispatch({ type: "SET_PAIN_SCORE", payload: { symptom, score } });
+  const setPainScore = (score: number) => {
+    dispatch({ type: "SET_PAIN_SCORE", payload: score });
   };
 
   const setPriority = (level: PriorityLevel) => {
@@ -367,16 +358,7 @@ export function TriageProvider({ children }: { children: ReactNode }) {
       return 1;
     }
 
-    // Look up in truth table
-    const key = createTruthTableKey();
-    if (truthTable[key]) {
-      const tablePriority = truthTable[key];
-      setPriority(tablePriority);
-      return tablePriority;
-    }
-
-    // If not in truth table, use pain score logic
-    const painScore = state.painScores[state.symptom];
+    const painScore = state.painScore;
 
     let calculatedPriority: PriorityLevel;
     if (painScore > 7) {
@@ -393,6 +375,15 @@ export function TriageProvider({ children }: { children: ReactNode }) {
     if (state.symptom === "breathing" && !state.isPassingOut) {
       calculatedPriority = 3;
     }
+    // Look up in truth table
+    // const key = createTruthTableKey();
+    // if (truthTable[key]) {
+    //   const tablePriority = truthTable[key];
+    //   setPriority(tablePriority);
+    //   return tablePriority;
+    // }
+
+    // If not in truth table, use pain score logic
 
     setPriority(calculatedPriority);
     return calculatedPriority;

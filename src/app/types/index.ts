@@ -61,7 +61,7 @@ export interface TriageState {
   phase: PhaseType;
   userInfo: UserInfo | null;
   responses: QuestionResponse[];
-  painScores: Record<SymptomType, number>;
+  painScore: number;
   currentPriority: PriorityLevel | null;
   isPassingOut: boolean;
   historyStack: RouteInfo[];

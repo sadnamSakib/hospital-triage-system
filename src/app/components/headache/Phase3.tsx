@@ -42,10 +42,10 @@ export default function HeadachePhase3() {
           <Alert
             type="info"
             title="Headache Severity"
-            message={`Your headache severity is ${state.painScores.headache}/10.`}
+            message={`Your headache severity is ${state.painScore}/10.`}
           />
 
-          {state.painScores.headache >= 7 && (
+          {state.painScore >= 7 && (
             <Alert
               type="warning"
               title="Warning"
@@ -58,7 +58,7 @@ export default function HeadachePhase3() {
         <div className="bg-gray-100 p-4 rounded-md mb-6">
           <h3 className="font-medium mb-2">Initial Assessment:</h3>
           <p>
-            <strong>Pain Level:</strong> {state.painScores.headache}/10
+            <strong>Pain Level:</strong> {state.painScore}/10
           </p>
           <p>
             <strong>Initial Priority:</strong>{" "}

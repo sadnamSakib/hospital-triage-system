@@ -14,7 +14,7 @@ export default function PriorityScreen() {
     if (!state.currentPriority) {
       calculatePriority();
     }
-  }, [state.currentPriority, calculatePriority]);
+  }, []);
 
   const getPriorityText = () => {
     switch (state.currentPriority) {
@@ -78,8 +78,8 @@ export default function PriorityScreen() {
               {state.symptom === "breathing" && "Breathing Difficulty"}
 
               {state.symptom !== "none" &&
-                state.painScores[state.symptom] > 0 &&
-                ` (Severity: ${state.painScores[state.symptom]}/10)`}
+                state.painScore > 0 &&
+                ` (Severity: ${state.painScore}/10)`}
             </p>
 
             {/* Display relevant responses */}

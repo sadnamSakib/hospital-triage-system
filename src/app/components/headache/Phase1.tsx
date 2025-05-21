@@ -15,7 +15,7 @@ export default function HeadachePhase1() {
   // Handle continue button
   const handleContinue = () => {
     // Save the pain score
-    setPainScore("headache", painLevel);
+    setPainScore(painLevel);
 
     // Check for emergency condition
     if (painLevel >= 7) {

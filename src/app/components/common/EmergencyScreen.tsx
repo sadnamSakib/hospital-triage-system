@@ -12,7 +12,7 @@ export default function EmergencyScreen() {
   // Set priority to 1 (Emergency) when this screen loads
   useEffect(() => {
     setPriority(1);
-  }, [setPriority]);
+  }, []);
 
   // Get appropriate emergency message based on the symptom
   const getEmergencyMessage = () => {
@@ -75,8 +75,8 @@ export default function EmergencyScreen() {
               {state.symptom === "breathing" && "Breathing Difficulty"}
 
               {state.symptom !== "none" &&
-                state.painScores[state.symptom] > 0 &&
-                ` (Severity: ${state.painScores[state.symptom]}/10)`}
+                state.painScore > 0 &&
+                ` (Severity: ${state.painScore}/10)`}
             </p>
           </div>
         </div>
