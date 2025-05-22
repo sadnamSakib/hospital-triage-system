@@ -8,7 +8,7 @@ import { useTriageContext } from "../../context/TriageContext";
 
 // Breathing Difficulty Phase 5 - Pregnancy Assessment
 export default function BreathingPhase5() {
-  const { addResponse, calculatePriority, nextPhase, goBack } =
+  const { addResponse, calculatePriority, nextPhase, goBack, setDiagnosis, setToken, state } =
     useTriageContext();
   const [isPregnant, setIsPregnant] = useState("no");
 
@@ -18,7 +18,18 @@ export default function BreathingPhase5() {
     addResponse({ id: "isPregnant", answer: isPregnant === "yes" });
 
     // Calculate priority based on all collected responses
-    calculatePriority();
+    calculatePriority(true);
+
+    // --- DIAGNOSIS LOGIC ---
+    let diagnosis = isPregnant === "yes" ? "Fetus risk" : "Breathing issue";
+    setDiagnosis(diagnosis);
+
+    // --- TOKEN LOGIC ---
+    let serial = parseInt(localStorage.getItem("triage_serial") || "0", 10) + 1;
+    localStorage.setItem("triage_serial", serial.toString());
+    const token = `B-${serial}`;
+    setToken(token);
+    localStorage.setItem("triage_token", token);
 
     // Continue to final phase for common questions
     nextPhase();

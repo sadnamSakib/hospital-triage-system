@@ -52,18 +52,15 @@ export default function PriorityScreen() {
       <Card className="max-w-lg w-full">
         <h2 className="text-2xl font-bold mb-4">Triage Complete</h2>
 
-        <Alert
-          type={getAlertType()}
-          title={`Priority Level: ${state.currentPriority || 'Not determined'}`}
-          message={getPriorityText()}
-        />
+        {/* Diagnosis and Token Section */}
+        <div className="bg-green-100 p-4 rounded-md mb-4 text-center">
+          <h3 className="font-medium mb-2">Diagnosis:</h3>
+          <p className="text-lg font-semibold">{state.diagnosis || "Not determined"}</p>
+          <h3 className="font-medium mt-4 mb-2">Your Waiting Token:</h3>
+          <p className="text-2xl font-bold">{state.token || "-"}</p>
+        </div>
 
         <div className="mt-6">
-          <p className="mb-4">
-            Based on your symptoms, you have been assigned a priority level of{" "}
-            {state.currentPriority}.
-          </p>
-
           <div className="bg-gray-100 p-4 rounded-md mb-4">
             <h3 className="font-medium mb-2">Symptoms Summary:</h3>
             <p>
@@ -126,8 +123,7 @@ export default function PriorityScreen() {
 
         <div className="mt-6 text-center">
           <p className="font-medium mb-4">
-            Please take a seat in the waiting area. A healthcare professional
-            will call you based on your priority level.
+            Please take a seat in the waiting area. You will be called by your token number: <span className="font-bold">{state.token || "-"}</span>.
           </p>
           <Button onClick={handleRestart} fullWidth>
             Complete &amp; Start New Assessment

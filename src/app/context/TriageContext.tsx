@@ -29,6 +29,8 @@ const initialState: TriageState = {
   isPassingOut: false,
   historyStack: [{ symptom: "none", phase: "start" }],
   inactive: false,
+  diagnosis: "",
+  token: "",
 };
 
 // Action types
@@ -41,7 +43,9 @@ type ActionType =
   | { type: "SET_PASSING_OUT"; payload: boolean }
   | { type: "SET_INACTIVE"; payload: boolean }
   | { type: "GO_BACK" }
-  | { type: "RESET" };
+  | { type: "RESET" }
+  | { type: "SET_DIAGNOSIS"; payload: string }
+  | { type: "SET_TOKEN"; payload: string };
 
 // Reducer function
 function triageReducer(state: TriageState, action: ActionType): TriageState {
@@ -136,6 +140,16 @@ function triageReducer(state: TriageState, action: ActionType): TriageState {
       };
     case "RESET":
       return initialState;
+    case "SET_DIAGNOSIS":
+      return {
+        ...state,
+        diagnosis: action.payload,
+      };
+    case "SET_TOKEN":
+      return {
+        ...state,
+        token: action.payload,
+      };
     default:
       return state;
   }
@@ -156,6 +170,8 @@ interface TriageContextType {
   reset: () => void;
   calculatePriority: (updateState?: boolean) => PriorityLevel;
   nextPhase: () => void;
+  setDiagnosis: (diagnosis: string) => void;
+  setToken: (token: string) => void;
 }
 
 // Create context
@@ -377,6 +393,14 @@ export function TriageProvider({ children }: { children: ReactNode }) {
     setRoute({ symptom: state.symptom, phase: nextPhase });
   };
 
+  const setDiagnosis = (diagnosis: string) => {
+    dispatch({ type: "SET_DIAGNOSIS", payload: diagnosis });
+  };
+
+  const setToken = (token: string) => {
+    dispatch({ type: "SET_TOKEN", payload: token });
+  };
+
   return (
     <TriageContext.Provider
       value={{
@@ -393,6 +417,8 @@ export function TriageProvider({ children }: { children: ReactNode }) {
         reset,
         calculatePriority,
         nextPhase,
+        setDiagnosis,
+        setToken,
       }}
     >
       {children}

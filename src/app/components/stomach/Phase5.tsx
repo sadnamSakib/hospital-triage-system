@@ -8,7 +8,7 @@ import { useTriageContext } from "../../context/TriageContext";
 
 // Stomach Pain Phase 5 - Unique questions based on flowchart
 export default function StomachPhase5() {
-  const { addResponse, calculatePriority, nextPhase, goBack } =
+  const { addResponse, calculatePriority, nextPhase, goBack, setDiagnosis, setToken, state } =
     useTriageContext();
 
   // State for stomach-specific Phase 5 questions from flowchart (exact order)

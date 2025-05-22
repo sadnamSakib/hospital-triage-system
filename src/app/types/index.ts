@@ -70,6 +70,8 @@ export interface TriageState {
   isPassingOut: boolean;
   historyStack: RouteInfo[];
   inactive: boolean;
+  diagnosis?: string;
+  token?: string;
 }
 
 // Additional question types for specific symptoms

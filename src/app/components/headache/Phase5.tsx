@@ -8,7 +8,7 @@ import { useTriageContext } from "../../context/TriageContext";
 
 // Headache Phase 5 - Unique questions for headache
 export default function HeadachePhase5() {
-  const { addResponse, calculatePriority, nextPhase, goBack } =
+  const { addResponse, calculatePriority, nextPhase, goBack, setDiagnosis, setToken, state } =
     useTriageContext();
 
   // State for headache-specific questions (exact order from flowchart)
@@ -26,7 +26,73 @@ export default function HeadachePhase5() {
     addResponse({ id: "hasRash", answer: hasRash === "yes" });
 
     // Calculate priority based on truth table
-    calculatePriority();
+    calculatePriority(true);
+
+    // --- DIAGNOSIS LOGIC (from truth table) ---
+    // Convert answers to bits: hasFever, isPregnant, hasVomited, hasRash
+    const bits = [hasFever, isPregnant, hasVomited, hasRash].map((v) => v === "yes" ? 1 : 0).join("");
+    let diagnosis = "";
+    switch (bits) {
+      case "0000":
+        diagnosis = "Pain";
+        break;
+      case "0001":
+        diagnosis = "Meningitis";
+        break;
+      case "0010":
+        diagnosis = "Sepsis";
+        break;
+      case "0011":
+        diagnosis = "Meningitis";
+        break;
+      case "0100":
+        diagnosis = "Fetus risk";
+        break;
+      case "0101":
+        diagnosis = "Fetus risk";
+        break;
+      case "0110":
+        diagnosis = "Fetus risk";
+        break;
+      case "0111":
+        diagnosis = "Fetus risk";
+        break;
+      case "1000":
+        diagnosis = "Pain";
+        break;
+      case "1001":
+        diagnosis = "Meningitis";
+        break;
+      case "1010":
+        diagnosis = "Sepsis";
+        break;
+      case "1011":
+        diagnosis = "Meningitis";
+        break;
+      case "1100":
+        diagnosis = "Fetus risk";
+        break;
+      case "1101":
+        diagnosis = "Fetus risk";
+        break;
+      case "1110":
+        diagnosis = "Fetus risk";
+        break;
+      case "1111":
+        diagnosis = "Fetus risk";
+        break;
+      default:
+        diagnosis = "Pain";
+    }
+    setDiagnosis(diagnosis);
+
+    // --- TOKEN LOGIC ---
+    // Generate a serial number (incremental)
+    let serial = parseInt(localStorage.getItem("triage_serial") || "0", 10) + 1;
+    localStorage.setItem("triage_serial", serial.toString());
+    const token = `H-${serial}`;
+    setToken(token);
+    localStorage.setItem("triage_token", token);
 
     // Proceed to the next phase
     nextPhase();
