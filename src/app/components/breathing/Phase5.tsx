@@ -17,11 +17,71 @@ export default function BreathingPhase5() {
     // Save response
     addResponse({ id: "isPregnant", answer: isPregnant === "yes" });
 
+    // Get other responses for breathing phase 5
+    const hasFever = state.responses.find(r => r.id === "hasFever")?.answer === true ? "yes" : "no";
+    const hasCough = state.responses.find(r => r.id === "hasCough")?.answer === true ? "yes" : "no";
+    const hasAsthma = state.responses.find(r => r.id === "hasAsthma")?.answer === true ? "yes" : "no";
+    // isPregnant is from local state
+
     // Calculate priority based on all collected responses
     calculatePriority(true);
 
-    // --- DIAGNOSIS LOGIC ---
-    let diagnosis = isPregnant === "yes" ? "Fetus risk" : "Breathing issue";
+    // --- DIAGNOSIS LOGIC (from truth table) ---
+    // Bit order: hasFever, hasCough, hasAsthma, isPregnant
+    const bits = [hasFever, hasCough, hasAsthma, isPregnant].map((v) => v === "yes" ? 1 : 0).join("");
+    let diagnosis = "";
+    switch (bits) {
+      case "0000":
+        diagnosis = "Asthma";
+        break;
+      case "0001":
+        diagnosis = "Fetus risk";
+        break;
+      case "0010":
+        diagnosis = "Asthma";
+        break;
+      case "0011":
+        diagnosis = "Fetus risk";
+        break;
+      case "0100":
+        diagnosis = "Cold";
+        break;
+      case "0101":
+        diagnosis = "Fetus risk";
+        break;
+      case "0110":
+        diagnosis = "Cold";
+        break;
+      case "0111":
+        diagnosis = "Fetus risk";
+        break;
+      case "1000":
+        diagnosis = "Sepsis";
+        break;
+      case "1001":
+        diagnosis = "Fetus risk";
+        break;
+      case "1010":
+        diagnosis = "Sepsis";
+        break;
+      case "1011":
+        diagnosis = "Fetus risk";
+        break;
+      case "1100":
+        diagnosis = "Sepsis";
+        break;
+      case "1101":
+        diagnosis = "Fetus risk";
+        break;
+      case "1110":
+        diagnosis = "Sepsis";
+        break;
+      case "1111":
+        diagnosis = "Fetus risk";
+        break;
+      default:
+        diagnosis = "Breathing issue";
+    }
     setDiagnosis(diagnosis);
 
     // --- TOKEN LOGIC ---

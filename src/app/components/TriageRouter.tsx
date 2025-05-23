@@ -142,3 +142,50 @@ export function TriageRouter() {
       return <StartScreen />;
   }
 }
+
+// Helper for tests: get component for phase and symptom
+import type { SymptomType, PhaseType } from "../types";
+export function getPhaseComponent(symptom: SymptomType, phase: PhaseType) {
+  switch (symptom) {
+    case "headache":
+      switch (phase) {
+        case "phase1": return HeadachePhase1;
+        case "phase2": return HeadachePhase2;
+        case "phase3": return HeadachePhase3;
+        case "phase4": return HeadachePhase4;
+        case "phase5": return HeadachePhase5;
+        case "phase6": return HeadachePhase6;
+        default: return StartScreen;
+      }
+    case "chest":
+      switch (phase) {
+        case "phase1": return ChestPhase1;
+        case "phase2": return ChestPhase2;
+        case "phase3": return ChestPhase3;
+        case "phase4": return ChestPhase4;
+        default: return StartScreen;
+      }
+    case "stomach":
+      switch (phase) {
+        case "phase1": return StomachPhase1;
+        case "phase2": return StomachPhase2;
+        case "phase3": return StomachPhase3;
+        case "phase4": return StomachPhase4;
+        case "phase5": return StomachPhase5;
+        case "phase6": return StomachPhase6;
+        default: return StartScreen;
+      }
+    case "breathing":
+      switch (phase) {
+        case "phase1": return BreathingPhase1;
+        case "phase2": return BreathingPhase2;
+        case "phase3": return BreathingPhase3;
+        case "phase4": return BreathingPhase4;
+        case "phase5": return BreathingPhase5;
+        case "phase6": return BreathingPhase6;
+        default: return StartScreen;
+      }
+    default:
+      return StartScreen;
+  }
+}

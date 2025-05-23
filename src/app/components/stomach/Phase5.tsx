@@ -32,7 +32,78 @@ export default function StomachPhase5() {
     });
 
     // Calculate priority based on responses using the truth table
-    calculatePriority();
+    calculatePriority(true);
+
+    // --- DIAGNOSIS LOGIC (from truth table) ---
+    // Convert answers to bits: isNauseous, hasVomited, hasRegularBowelMotions, isPainWorseWhenStill
+    const bits = [isNauseous, hasVomited, hasRegularBowelMotions, isPainWorseWhenStill].map((v) => v === "yes" ? 1 : 0).join("");
+    let diagnosis = "";
+    switch (bits) {
+      case "0000":
+        diagnosis = "Pain";
+        break;
+      case "0001":
+        diagnosis = "Pain";
+        break;
+      case "0010":
+        diagnosis = "Pain";
+        break;
+      case "0011":
+        diagnosis = "Pain";
+        break;
+      case "0100":
+        diagnosis = "Pain";
+        break;
+      case "0101":
+        diagnosis = "Pain";
+        break;
+      case "0110":
+        diagnosis = "Pain";
+        break;
+      case "0111":
+        diagnosis = "Pain";
+        break;
+      case "1000":
+        diagnosis = "Pain";
+        break;
+      case "1001":
+        diagnosis = "Pain";
+        break;
+      case "1010":
+        diagnosis = "Pain";
+        break;
+      case "1011":
+        diagnosis = "Pain";
+        break;
+      case "1100":
+        diagnosis = "Pain";
+        break;
+      case "1101":
+        diagnosis = "Pain";
+        break;
+      case "1110":
+        diagnosis = "Pain";
+        break;
+      case "1111":
+        diagnosis = "Pain";
+        break;
+      default:
+        diagnosis = "Pain";
+    }
+    // Add special cases from the truth table for sepsis and fetus risk
+    if (["0010", "1010", "0110", "1110", "0011", "1011", "0111", "1111"].includes(bits)) {
+      diagnosis = "Sepsis";
+    } else if (["0100", "0101", "1100", "1101"].includes(bits)) {
+      diagnosis = "Fetus risk";
+    }
+    setDiagnosis(diagnosis);
+
+    // --- TOKEN LOGIC ---
+    let serial = parseInt(localStorage.getItem("triage_serial") || "0", 10) + 1;
+    localStorage.setItem("triage_serial", serial.toString());
+    const token = `S-${serial}`;
+    setToken(token);
+    localStorage.setItem("triage_token", token);
 
     // Proceed to next phase
     nextPhase();

@@ -109,3 +109,17 @@ export interface CommonQuestions {
   painConstant: boolean;
   painDuration: "hour" | "day" | "week" | "longer";
 }
+
+// Triage test case type for testing framework
+export type TriageTestCase = {
+  name: string;
+  symptom: "headache" | "stomach" | "breathing" | "chest";
+  answers: { [phase: string]: { [questionId: string]: string | boolean } };
+  expected: {
+    diagnosis: string;
+    tokenPrefix: string;
+    priority: number;
+  };
+};
+
+export type { TriageTestCase };

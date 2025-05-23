@@ -434,3 +434,11 @@ export function useTriageContext() {
   }
   return context;
 }
+
+// Helper for tests: reset triage serial
+export function resetTriageSerial() {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('triage_serial', '0');
+    localStorage.removeItem('triage_token');
+  }
+}
